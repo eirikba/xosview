@@ -66,8 +66,12 @@ void MeterMaker::makeMeters(void){
       push(new CPUMeter(_xos, CPUMeter::cpuStr(0)));
 
     if (all || both) {
-      for (unsigned int i = 1; i <= cpuCount; i++)
-	push(new CPUMeter(_xos, CPUMeter::cpuStr(i)));
+      unsigned int realCores = cpuCount / 2;
+      for (unsigned int i = 1; i <= realCores; i++) {
+          push(new CPUMeter(_xos, CPUMeter::cpuStr(i)));
+          if (i + realCores <= cpuCount)
+            push(new CPUMeter(_xos, CPUMeter::cpuStr(i + realCores)));
+      }
     }
   }
   if (_xos->isResourceTrue("mem"))

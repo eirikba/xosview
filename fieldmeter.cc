@@ -114,19 +114,19 @@ void FieldMeter::setfieldcolor( int field, unsigned long color ) {
 }
 
 void FieldMeter::draw( void ){
+  if (!dolegends_)
+      legendsOffset_ = 0;
+  else if (dousedlegends_)
+      legendsOffset_ = parent_->textWidth( "XXXXXXXXXX" );
+  else
+      legendsOffset_ = parent_->textWidth( "XXXXXX" );
+
     /*  Draw the outline for the fieldmeter.  */
   parent_->setForeground( parent_->foreground() );
   parent_->drawRectangle( x_ - 1, y_ - 1, width_ + 2, height_ + 2 );
-  if ( dolegends_ ){
+  if ( dolegends_ && !isCompact()){
     parent_->setForeground( textcolor_ );
-
-    int offset;
-    if ( dousedlegends_ )
-      offset = parent_->textWidth( "XXXXXXXXXX" );
-    else
-      offset = parent_->textWidth( "XXXXXX" );
-
-    parent_->drawString( x_ - offset + 1, y_ + height_, title_ );
+    parent_->drawString( x_ + 1, y_ - 5, title_ );
   }
 
   drawlegend();
@@ -135,13 +135,13 @@ void FieldMeter::draw( void ){
 
 void FieldMeter::drawlegend( void ){
   char *tmp1, *tmp2, buff[100];
-  int n, x = x_;
+  int n, x = x_ + legendsOffset_;
 
-  if (!docaptions_ || !dolegends_)
+  if (!docaptions_ || !dolegends_ || isCompact())
     return;
 
-  parent_->clear( x_, y_ - 5 - parent_->textHeight(),
-                  width_ + 5, parent_->textHeight() + 4 );
+  parent_->clear( x, y_ - 5 - parent_->textHeight(),
+        width_ + 5, parent_->textHeight() + 4 );
 
   tmp1 = tmp2 = legend_;
   for ( int i = 0 ; i < numfields_ ; i++ ){
@@ -169,6 +169,8 @@ void FieldMeter::drawlegend( void ){
 }
 
 void FieldMeter::drawused( int mandatory ){
+  if (isCompact())
+    return;
   if ( !mandatory )
     if ( lastused_ == used_ )
       return;
@@ -210,11 +212,11 @@ void FieldMeter::drawused( int mandatory ){
       snprintf( buf, 10, "%.0f", used_ );
   }
 
-  parent_->clear( x_ - usedoffset_, y_ + height_ - parent_->textHeight(),
+  parent_->clear( x_ + legendsOffset_ - usedoffset_, y_ - 5 - parent_->textHeight(),
                   usedoffset_ - onechar / 2, parent_->textHeight() + 1 );
   parent_->setForeground( usedcolor_ );
-  parent_->drawString( x_ - (strlen( buf ) + 1 ) * onechar + 2,
-                       y_ + height_, buf );
+  parent_->drawString( x_ + legendsOffset_ - (strlen( buf ) + 1 ) * onechar + 2,
+                       y_ - 5, buf );
   lastused_ = used_;
 }
 

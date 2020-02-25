@@ -159,10 +159,12 @@ void XOSView::checkVersion(int argc, char *argv[]) const
 
 void XOSView::figureSize ( void ) {
   if ( legend_ ){
+#if 0
     if ( !usedlabels_ )
       xoff_ = textWidth( "XXXXXX" );
     else
       xoff_ = textWidth( "XXXXXXXXXX" );
+#endif
 
     yoff_ = caption_ ? textHeight() + textHeight() / 4 : 0;
   }
@@ -270,19 +272,49 @@ void  XOSView::resize( void ){
   int rightmargin = hmargin_;
   int newwidth = width_ - xoff_ - rightmargin;
 
-  int newheight =
-        (height_ -
-         (topmargin + topmargin + (nummeters_-1)*spacing + nummeters_*yoff_)
-        ) / nummeters_;
+  const int singleLineHeight = 4;
+  int fixedCount = 0;
+  int scaledCount = 0;
+  int compactCount = 0;
+  for (MeterNode* meter = meters_; meter != NULL; meter = meter->next_)
+      if (meter->meter_->isSingleLine())
+          fixedCount += 1;
+      else if (meter->meter_->isCompact())
+          compactCount += 1;
+      else
+          scaledCount += 1;
+  int numVSpacings = nummeters_ - 1 - compactCount / 2;
+  int numHeaders = nummeters_ - compactCount;
+  int totalSpacing = topmargin * 2 + numVSpacings * spacing + numHeaders * yoff_;
+  int newheight = height_ - fixedCount * singleLineHeight - totalSpacing;
+  newheight = newheight * 5 / (scaledCount * 5 + compactCount);
   newheight = (newheight >= 2) ? newheight : 2;
 
 
   int counter = 1;
   MeterNode *tmp = meters_;
+  int cury = topmargin;
+  int curx = xoff_;
+  int halfwidth = width_ / 2 - rightmargin * 2;
   while ( tmp != NULL ) {
-    tmp->meter_->resize( xoff_,
-                         topmargin + counter*yoff_ + (counter-1)*(newheight+spacing),
-                        newwidth, newheight );
+    int height = newheight;
+    int width = newwidth;
+    if (tmp->meter_->isCompact()) {
+        height *= 0.4;
+        width = halfwidth;
+    } else
+        cury += yoff_;
+    if (tmp->meter_->isSingleLine())
+        height = singleLineHeight;
+    if (height < 2)
+        height = 2;
+    tmp->meter_->resize( curx, cury, width, height );
+    if (tmp->meter_->isCompact() && curx == xoff_) {
+        curx = width_ - halfwidth - rightmargin;
+    } else {
+        curx = xoff_;
+        cury += height + spacing;
+    }
     tmp = tmp->next_;
 
     counter++;

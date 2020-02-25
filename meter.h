@@ -18,6 +18,8 @@ public:
   virtual ~Meter( void );
 
   virtual const char *name( void ) const { return "Meter"; }
+  virtual bool isSingleLine() const { return false; }
+  virtual bool isCompact() const { return false; }
   void resize( int x, int y, int width, int height );
   virtual void checkevent( void ) = 0;
   virtual void draw( void ) = 0;
@@ -51,6 +53,7 @@ public:
 protected:
   XOSView *parent_;
   int x_, y_, width_, height_, docaptions_, dolegends_, dousedlegends_;
+  int legendsOffset_;
   int priority_, counter_;
   char *title_, *legend_;
   unsigned long textcolor_;

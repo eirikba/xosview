@@ -17,6 +17,7 @@ public:
   ~CPUMeter(void);
 
   const char *name(void) const { return "CPUMeter"; }
+  virtual bool isCompact() const { return _lineNum != 0; }
   void checkevent(void);
 
   void checkResources(void);

@@ -24,6 +24,7 @@ public:
   virtual ~FieldMeterGraph( void );
 
   virtual void drawfields( int mandatory = 0 );
+  virtual bool isSingleLine() const { return !useGraph_; }
 
   virtual void checkResources( void );
 

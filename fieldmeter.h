@@ -20,6 +20,7 @@ public:
   virtual ~FieldMeter( void );
 
   virtual void drawfields( int mandatory = 0 );
+  bool isSingleLine() const { return true; }
   void setfieldcolor( int field, const char *color );
   void setfieldcolor( int field, unsigned long color);
   void docaptions( int val ) { docaptions_ = val; }

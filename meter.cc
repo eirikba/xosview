@@ -17,6 +17,12 @@ Meter::Meter( XOSView *parent, const char *title, const char *legend,
   docaptions_ = docaptions;
   dolegends_ = dolegends;
   dousedlegends_ = dousedlegends;
+  if (!dolegends_)
+      legendsOffset_ = 0;
+  else if (dousedlegends_)
+      legendsOffset_ = parent_->textWidth( "XXXXXXXXXX" );
+  else
+      legendsOffset_ = parent_->textWidth( "XXXXXX" );
   priority_ = 1;
   counter_ = 0;
   resize( parent->xoff(), parent->newypos(), parent->width() - 10, 10 );
